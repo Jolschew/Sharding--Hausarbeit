@@ -1,3 +1,13 @@
+# TODO
+### TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+
+- Rechtschreibprüfung
+- Absätze richtig gesetzt?
+- Vorteile /Nachteile
+- Einleitung /Fazit
+- Kevins Teil einfügen
+
+
 <center> <h1> Sharding</h1>
 <h2>Erklären Sie unterschiedliche Sharing-Strategie anhand praktischer Beispiele </h2>
 <h3>Kevin Berg </h3>
@@ -27,7 +37,14 @@ Elasticsearch ist eine ist eine Client-Server Suchmaschine, welche die Suchergeb
 Die RESTful API, welche Elasticsearch zu Client-Server-Kommunikation nutzt, ist ein Konzept welches Eigenschaften wie Zustandslosigkeit, Addressierbarkeit und festgelegte Operationen für entsprechende Dienste vorschreibt [ICS-2000]. Diese Dienste kommunizieren über das HTTP-Protokoll. Da jede Suchanfrage als URL formuliert wird, ist sie auch stets einzigartig und eindeutig adressierbar.
 
 Durch die Eigenschaft von Elasticsearch als Volltext-Suchamschine mit einer NoSQL-Datenbank im Kern, ist es potentiell möglich, dass auch sehr viele Daten aufgenommen werden. Mehrere Milliarden Dokumente in einem Index führen auch zu mehreren TerraByte an benötigtem Festplattenspeicher. Dann ist es wahrscheinlich, dass die Server-Festplatte zu klein oder langsam ist, viele Suchrequests auf einem Index zu verarbeiten
+
+Um ein genaues Verständnis dafür zu bekommen, wie Elasticsearch das Sharding vollkommen selbständig übernimmt, ist es notwendig einige Basiskonzepte von Elasticsearch zu erkennen.
+Vorangegangen wurde ja bereits der Begriff Cluster erwähnt. Doch was zeichnet einen Cluster in Elasticsearch aus? Ein Cluster ist eine Collection von ein oder mehreren Nodes, welche die gesamten Daten eines oder mehrerer Indizes beinhaltet und verwaltet. Außerdem stellt er die "Suchbarkeit" über alle Nodes innerhalb des CLusters bereit. So ist es zum Beispiel möglich, mit entsprechnder Konfiguration, auf mehreren Indizes gleichzeitig zu suchen. In der Regel befindet sich in einem Cluster ein Node mit einem Index. Lediglich in großen Datenstrukturen macht es Sinn mehreren Nodes innerhalb eines Clusters zu haben. Dies ist immer dann besonders sinvoll, wenn man über mehrere Server verfügt, die dann als Gesamtheit einen Cluster blden.
+
+
 Elasticsearch erstellt die Shards innerhalb des Clusters standardmäßig vollautomatisch, um die vertikale Skalierbarkeit zu gewährleisten und die Suche performant zu halten. Zusätlich wird zu jedem Shard ein Backup angelegt. Sollte ein Shard unerwartet nicht mehr lesbar oder verfügbar sein, kann auf das Replika zurückgeriffen werden.
+
+
 
 Ein Beispiel zeigt, wie sich dieses Prinzip in der Praxis verhält:
 Für die Elasticsearch-Suchengine werden zwei identische Server gemietet, welche die Suchanfragen verarbeiten sollen. Auf diesen läuft dann jeweils eine Elasticsearch-Instanz (Node). Wenn ein Server aufgrund von Stromausfall oder ähnlichen Problemen nicht erreichbar ist, kann die Suche immer noch auf der anderen Maschine erfolgen. Die Server teilen sich also normalerweise die Arbeit, wenn es aber zu Problemen eine Servers kommt, so „springt“ der andere für ihn ein, um die komplette Funktionalität weiter zu gewährleisten.
@@ -37,13 +54,13 @@ Für die Elasticsearch-Suchengine werden zwei identische Server gemietet, welche
 
 Die Daten des Index’ werden durch Elastiscsearch wie gesagt in 5 Shards mit jeweils einem Replika aufgeteilt. Das Replika jedes Shards befindet sich niemals auf der selben Node, um die ständige Verfügbarkeit zu gewährleisten. Für eine Infrastruktur mit zwei Nodes kann die Aufteilung dann folgendermaßen aussehen:
 
-| Node   | Shard      | Shard-Replika  |
-| ------ |:----------:| --------------:|
-| 1      | Server 1   | Server 2       |
-| 2      | Server 1   | Server 2       |
-| 3      | Server 1   | Server 2       |
-| 4      | Server 2   | Server 1       |
-| 5      | Server 2   | Server 1       |
+| Node-Shard   | Shard      | Shard-Replika  |
+| -------------|:----------:| --------------:|
+| 1            | Server 1   | Server 2       |
+| 2            | Server 1   | Server 2       |
+| 3            | Server 1   | Server 2       |
+| 4            | Server 2   | Server 1       |
+| 5            | Server 2   | Server 1       |
 
 Besitzt das Cluster dann noch mehrere Indizes, werden diese wiederum in neue Shards aufgeteilt, welche dann völlig anders auf dem Server verteilt werden können.
 Folgendes Schaubild zeigt die Verteilung von zwei Indizes innerhalb der Beispiel-Topologie:
@@ -53,7 +70,9 @@ Folgendes Schaubild zeigt die Verteilung von zwei Indizes innerhalb der Beispiel
 
 Dieses Besipiel verdeutlicht, wie Elasticsearch das Sharding selbständig ausführt. Doch wie gewährleistet Elasticsearch die vertikale Skalierbarkeit? Darüber soll folgendes Beispiel Aufschluss geben:
 
-Im ersten Schritt wird ein neuer Index auf dem gestarteten Elasticsearch-Server angelegt. Dieser verfügt immer über das Standard-Setting mit 5 Shards und einem Replika pro Shard.
+Im ersten Schritt wird ein neuer Index auf dem gestarteten Elasticsearch-Server angelegt. Nun besitzen wir einen Index auf einer Node, welche sich in einem Cluster befindet. Eine Erstellung meherer Nodes, welche dann über eigenständige Shards verfügen ist ebenfalls möglich, soll in diesem Beispiel aber nicht weiter vertieft werden.
+
+Der Index auf dem Node verfügt immer über das Standard-Setting mit 5 Shards und einem Replika pro Shard.
 
 Das Anlegen erfolgt indem ein HTTP-POST auf den Elasticsearch-Server mit entsprechenden Document angelegt wird. Sollte es den Index noch nicht geben, wird er gleich mit erstellt.
 ```javascript
@@ -122,7 +141,7 @@ GET /books_less_shards/_settings
   }
 }
 ```
-Nun können Documents hinzugefügt werden, die sich selbstständig auf die einzelnen Shards aufteilen. Es wurden insgesamt 4 Documents vom Type book hinzugefügt
+Nun können Documents hinzugefügt werden, die sich selbstständig auf die einzelnen Shards aufteilen. Es wurden insgesamt 53 Documents vom Type book hinzugefügt
 ```javascript
 GET /books_less_shards/_search
 {
@@ -134,7 +153,7 @@ GET /books_less_shards/_search
       "failed": 0
    },
    "hits": {
-      "total": 4,
+      "total": 121,
       "max_score": 1,
       "hits": [
          {
@@ -144,23 +163,29 @@ GET /books_less_shards/_search
     }
 }
 ```
-Der Response zeigt an, dass sich nun 4 Documents im Index mit 3 Shards befinden. Um die Aufteilung auf die einzelnen Shards genauer zu untersuchen stellt Elasticsearch die Funktionaliät "segments" bereit:
-```javascript
+Der Response zeigt an, dass sich nun 4 Documents im Index mit 3 Shards befinden.
 
-{
-   "_shards": {
-      "total": 6,
-      "successful": 3,
-      "failed": 0
-   },
-   "indices": {
-      "books_less_shards2": {
-         "shards": {
-            "0": [...],
-            "1": [...],
-            "2": [...]            
-         }
-      }
-   }
-}
+Um die Aufteilung auf die einzelnen Shards genauer zu untersuchen kann folgender Befehl Aufschluss geben,:
+
+```javascript
+GET /_cat/shards/books_less_shards
+books_less_shards 0 p STARTED    41 26.5kb 127.0.0.1 Basil Sandhurst
+books_less_shards 0 r UNASSIGNED
+books_less_shards 1 p STARTED    42 17.5kb 127.0.0.1 Basil Sandhurst
+books_less_shards 1 r UNASSIGNED                                     
+books_less_shards 2 p STARTED    38 14.7kb 127.0.0.1 Basil Sandhurst
+books_less_shards 2 r UNASSIGNED                                     
+
 ```
+
+Diese Übersicht gibt verschiedene Informationen.
+- Spalte 1: der Index, auf dem der Shard gefunden wurde.
+- Spalte 2: für die Shard-Nummer auf der entsprechenden Node
+- Spalte 3: steht für primary (p) oder replica (r)
+- Spalte 4: Zustand des Shards. Die Replika-Shards wurden auf dieser Node bisher nicht zugewiesen
+- Spalte 5: Anzahl der Documents auf dem Shard
+- Spalte 6: Größe des Shards (steigt mit zunehmender Anzahl an Documents)
+- Spalte 7: IP-Adresse
+- Spalte 8: Node auf dem der Shard liegt.
+
+Zum Einen ist zu erkennen, dass 6 Shards existieren - drei Shards mit je einem Replika. Außerdem fällt auf, dass die Shard sehr gleichmäßig verteilt sind. Elasticsearch gewährleistet somit, dass auch die Lastverteiliung bei mehreren Queries stets ausgeglichen bleibt. In diesem Beispiel liegen alle Shards auf einer Node, wleche sich auf einnem Server befindet. Wie jedoch bereits erwähnt, ermöglicht Elasticsearch es ebenfalls Shards auf unterschiedlichen Nodes zu haben, welche gemeinsam den Index bilden.
