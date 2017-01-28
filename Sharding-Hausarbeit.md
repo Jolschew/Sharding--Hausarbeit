@@ -9,7 +9,7 @@
 
 
 <center> <h1> Sharding</h1>
-<h2>Erklären Sie unterschiedliche Sharing-Strategie anhand praktischer Beispiele </h2>
+<h2>Erklären Sie unterschiedliche Sharing-Strategien anhand praktischer Beispiele </h2>
 <h3>Kevin Berg </h3>
 <h3>Jan Olschewski - 233673 </h3> </center>
 
@@ -186,12 +186,13 @@ Um die Aufteilung auf die einzelnen Shards genauer zu untersuchen kann folgender
 
 ```javascript
 GET /_cat/shards/books_less_shards
-books_less_shards 0 p STARTED    41 26.5kb 127.0.0.1 Basil Sandhurst
-books_less_shards 0 r UNASSIGNED
-books_less_shards 1 p STARTED    42 17.5kb 127.0.0.1 Basil Sandhurst
-books_less_shards 1 r UNASSIGNED                                     
-books_less_shards 2 p STARTED    38 14.7kb 127.0.0.1 Basil Sandhurst
-books_less_shards 2 r UNASSIGNED                                     
+books_less_shards 2 p STARTED    38  8.4kb 127.0.0.1 Acrobat
+books_less_shards 2 r UNASSIGNED                             
+books_less_shards 1 p STARTED    42 14.6kb 127.0.0.1 Acrobat
+books_less_shards 1 r UNASSIGNED                             
+books_less_shards 0 p STARTED    41 23.7kb 127.0.0.1 Acrobat
+books_less_shards 0 r UNASSIGNED                             
+
 
 ```
 
@@ -207,6 +208,48 @@ Diese Übersicht gibt verschiedene Informationen.
 
 Zum Einen ist zu erkennen, dass 6 Shards existieren - drei Shards mit je einem Replika. Außerdem fällt auf, dass die Shard sehr gleichmäßig verteilt sind. Elasticsearch gewährleistet somit, dass auch die Lastverteiliung bei mehreren Queries stets ausgeglichen bleibt. In diesem Beispiel liegen alle Shards auf einer Node, wleche sich auf einem Server befindet. Wie jedoch bereits erwähnt, ermöglicht Elasticsearch es ebenfalls Shards auf unterschiedlichen Nodes zu haben, welche gemeinsam den Index bilden.
 
+Außerdem ist zu erkennen, dass die Replika-Shards keine Daten enthalten. Damit ist jedoch die doppelte Datenhaltung nicht gewährleistet. Der Grund hierfür ist, dass der Replika-Shard niemals auf der gleichen Node wie der Prmär-Shard liegen darf. Wie bereits erwähnt dient das der Ausfallsicherheit, sollte ein Node nicht verfügbar sein.
+Deshalb werden zwei weitere Elasticsearch-Instanzen innerhalb des Clusters gestartet.
+
+Nun ist zu erkennen, dass auch die Replika-Shards auf den anderen Nodes zugewiesen wurden:
+```javascript
+GET /_cat/shards/books_less_shards
+books_less_shards 1 r STARTED 42 14.6kb 127.0.0.1 Zombie  
+books_less_shards 1 p STARTED 42 14.6kb 127.0.0.1 Jekyll  
+books_less_shards 2 r STARTED 38  8.4kb 127.0.0.1 Zombie  
+books_less_shards 2 p STARTED 38  8.4kb 127.0.0.1 Acrobat
+books_less_shards 0 r STARTED 41 23.7kb 127.0.0.1 Jekyll  
+books_less_shards 0 p STARTED 41 23.7kb 127.0.0.1 Acrobat
+
+```
+
+Um zu verdeutlichen, dass Elasticsearch sehr flexibel in der Verwaltung von Shards ist, sollen nun einzelne Shards auf andere Nodes verschoben werden. Hierfür stellt ELasticsearch den Reroute Befehl bereit:
+```javascript
+POST /_cluster/reroute
+{
+    "commands" : [ {
+        "move" :
+            {
+              "index" : "books_less_shards", "shard" : 0,
+              "from_node" : "Acrobat", "to_node" : "Zombie"
+            }
+        }
+    ]
+}
+
+GET /_cat/shards/books_less_shards
+books_less_shards 2 r STARTED 38  8.4kb 127.0.0.1 Zombie  
+books_less_shards 2 p STARTED 38  8.4kb 127.0.0.1 Acrobat
+books_less_shards 1 p STARTED 42 14.6kb 127.0.0.1 Jekyll  
+books_less_shards 1 r STARTED 42 14.6kb 127.0.0.1 Acrobat
+books_less_shards 0 p STARTED 41 23.7kb 127.0.0.1 Zombie  
+books_less_shards 0 r STARTED 41 23.7kb 127.0.0.1 Jekyll  
+
+```
+Der Shard 0 wurde von der Acrobat-Node auf die Zombie-Node verschoben. Der Replika Shard wurde davon nicht beeinflusst.
+
+Somit wurde verdeutlicht, dass es trotz der automatisierten Verwaltung der Shards durch Elasticsearch möglich ist die Shards auf den Nodes individuell zu verteilen. Das ist beispielsweise besonders hilfreich, wenn die Server unterschiedlich stark sind und somit auch unterschiedlich viele Shards enthalten sollten. 
+
 
 ## Fazit
-Shards lassen sich mittlerweile auf fast allen Datenbanktypen einrichten. Gerade hinsichtlich Kosteneffizienz und kurzer Antwortzeiten bringt es einen enormen Vorteil gegenüber ungeshardeter Datenbanken. Jedoch stellt das Einrichten von Shards einen zusätzlichen Aufwand dar, welcher sich dann wieder in Kosten niederschlägt. Jedoch verfügen NoSQL Implementationen, wie MongoDB oder die Such-Engine Elasticsearch über Mechanismen, welche einem die aufwändige Einrichtung und Verwaltung der Shards abnehmen. 
+Shards lassen sich mittlerweile auf fast allen Datenbanktypen einrichten. Gerade hinsichtlich Kosteneffizienz und kurzer Antwortzeiten bringt es einen enormen Vorteil gegenüber ungeshardeter Datenbanken. Jedoch stellt das Einrichten von Shards einen zusätzlichen Aufwand dar, welcher sich dann wieder in Kosten niederschlägt. Jedoch verfügen NoSQL Implementationen, wie MongoDB oder die Such-Engine Elasticsearch über Mechanismen, welche einem die aufwändige Einrichtung und Verwaltung der Shards abnehmen.
