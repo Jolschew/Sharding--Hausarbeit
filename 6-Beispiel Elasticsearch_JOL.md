@@ -1,59 +1,14 @@
-# TODO
-### TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-
-- Rechtschreibprüfung
-- Absätze richtig gesetzt?
-- Vorteile /Nachteile
-- Einleitung /Fazit
-- Kevins Teil einfügen
-
-
-<center> <h1> Sharding</h1>
-<h2>Erklären Sie unterschiedliche Sharing-Strategien anhand praktischer Beispiele </h2>
-<h3>Kevin Berg </h3>
-<h3>Jan Olschewski - 233673 </h3> </center>
-
-
-</br>
-
-## Inhaltsverzeichnis
-1. Einleitung
-- Vor- und Nachteile von Sharding
-- Beispiel: Mongo DB
-- Beispiel: MySQL
-- Beispiel: Elasticsearch
-- Fazit
-
-</br>
-
-
-## 1. Einleitung
-Im letzen Jahrzehnt wurden Begriffe wie Big Data und Skalierung immer wichtiger. Gerade heutige Datenbankinfrastruturen können viele GigaByte bis einige TerraByte an Daten halten. Deshalb mussten die Datenbankserver immer weiter wachsen, was zu immer größeren Kosten führte. Zusätzlich dazu verzoögerten sich Datenbankabfragen immer stärker, da die zu durchsuchenden Datenmengen einfach zu groß wurden. Im Zuge dieser Problematik bekam das Sharding einen immer höheren Stellenwert und hat heutzutage bei fast allen Datenbankimplentationen Einzug gehalten. Doch was ist Sharding und warum stellt es einen geeigneten Weg dar, die Datenbank (vertikal) zu skalieren?
-
-Sharding bezeichnet das horizontale Skalieren einer Datenbank. Dabei werden mehrere Systeme zusammengeschaltet und die Daten diese hinweg verteilt. Die Verteilung erfolgt dabei nicht willkürlich, sondern nach einem bestimmten Prinzip, welches Partitionieren genannt wird. Anhand von Shardingkeys werden die Daten als sogennante Chunks auf den einzelnen Maschinen verteilt. Die Shardingkeys repräsentieren einzelne Felder in den Dokumenten. Um die Dokumente gleichmäßig verteilen zu können, ist darauf zu achten, dass der Shardingkey (Wertebereich eines Datenfeldes der Datenbank) so gewählt wird, dass er viele Variationen zulässt. Alternativ können auch mehrere Felder miteinander kombiniert werden. Je nach festgelegtem Wertebereich der Shardingkeys werden die Daten anhand dessen auf die einzelnen Chunks aufgeteilt. Da die Datenbank für Abfragen aber auch wissen muss, auf welchem Chunk sich, die abzufragenden Daten befinden, gibt es eine spezielle Config-File, in welcher die Sharding-Keys mit zugehörigem Chunk hinterlegt sind. Anhand dessen kann die Datenbank genaue Zuordnungen treffen und Datensätze auch auf verschiedenen Maschinen finden.
-
-
-## Vor- und Nachteile von Sharding
-
-Vorteile:
-Große Datenmengen können über mehrere Server hinweg aufgeteilt werden. Weil Server mit viel Speicherplatz in der Regel eine exponentielle Preissteigerung im Vergleich zu vielen kleinen kostengünstigen Servern besitzen, stellt das Sharding eine gute Möglichkeit dar, die regelmäßigen Serverkosten zu minimieren, da auch große zusammenhängende Daten einer Datenbank auf vielen kleinen Servern verteilt werden können.
-Ein weiterer Vorteile ist, dass durch das Sharding ressourcenintensive Schreiboperationen parallelisiert werden können, da jeder Chunk über einen eigenen Server verfügt und somit eigenständig Schreib- und Leseoperationen ausführen kann. Zusätzlich muss durch das Aufteilen der Daten auch eine kleinere Datenmenge pro Server verwaltet werden, was zu kürzeren Antwortzeiten der jeweiligen Server führt.
-
-Nachteile:
-Sharding bietet neben seinen Vorteilen auch einige Nachteiel, die es beim Aufsetzen der Datenbank zu beachten gibt. Speziell relationale Datenbanken verfügen in der Regel nicht über eine Auto-Sharding Funktion. Das bedeutet dann auch, dass sich der Aufwand wesentlich erhöht, sollte man den Entschluss fassen eine geshardete Datenbank implementieren zu wollen. Da es ja gewünscht ist, dass die Daten auf die einzelnen Shards gleichmäßig verteilt werden, muss der Datenbank Adminsitrator ein Verfahren finden, welches die gleichmäßige Verteilung und automatische Verwaltung ermöglicht. Wenn dieses gefunden wurde, dann muss darauf geachtet werden, dass ein geeigneter Sharding-Schlüssel gefunden wird. Wenn das nicht der Fall ist und für eine Datenbank-Query vershchiedene Shards durchsucht werdn müssen, dann ist der Performancegewinn schnell wieder verschwunden und ein gegenteiliger Effekt kann eintreten.
-
-
-## Beispiel Elasticsearch
+## Beispiel Elasticsearch [ES2017]
 
 Elasticsearch ist eine ist eine Client-Server Suchmaschine, welche die Suchergebnisse in einem JSON-Format speichert und diese über RESTful-Webservice ausgibt. Daher handelt es sich bei der Datenbank, welche sich im Kern von Elasticsearch befindet um einen dokumentenbasierten Speicher. Innerhalb der Elasticsearch-Infrastruktur, dem sog. Cluster,  werden die Daten dann in Indizes gespeichert. Ein Index repräsentiert somit die Datenbank, welcher Typen enthält. Die werden von der Such-Engine wie Tabellen in einer Datenbank behandelt. In diesen Typen befinden sich dann die Dokumente mit Properties und Attributen (als Key-Value Paar)
-Die RESTful API, welche Elasticsearch zu Client-Server-Kommunikation nutzt, ist ein Konzept welches Eigenschaften wie Zustandslosigkeit, Addressierbarkeit und festgelegte Operationen für entsprechende Dienste vorschreibt [ICS-2000]. Diese Dienste kommunizieren über das HTTP-Protokoll. Da jede Suchanfrage als URL formuliert wird, ist sie auch stets einzigartig und eindeutig adressierbar.
+Die RESTful API, welche Elasticsearch zu Client-Server-Kommunikation nutzt, ist ein Konzept welches Eigenschaften wie Zustandslosigkeit, Addressierbarkeit und festgelegte Operationen für entsprechende Dienste vorschreibt [ICS2000]. Diese Dienste kommunizieren über das HTTP-Protokoll. Da jede Suchanfrage als URL formuliert wird, ist sie auch stets einzigartig und eindeutig adressierbar.
 
 Durch die Eigenschaft von Elasticsearch als Volltext-Suchamschine mit einer NoSQL-Datenbank im Kern, ist es potentiell möglich, dass auch sehr viele Daten aufgenommen werden. Mehrere Milliarden Dokumente in einem Index führen auch zu mehreren TerraByte an benötigtem Festplattenspeicher. Dann ist es wahrscheinlich, dass die Server-Festplatte zu klein oder langsam ist, viele Suchrequests auf einem Index zu verarbeiten
 
 Um ein genaues Verständnis dafür zu bekommen, wie Elasticsearch das Sharding vollkommen selbständig übernimmt, ist es notwendig einige Basiskonzepte von Elasticsearch zu erkennen.
-Vorangegangen wurde ja bereits der Begriff Cluster erwähnt. Doch was zeichnet einen Cluster in Elasticsearch aus? Ein Cluster ist eine Collection von ein oder mehreren Nodes, welche die gesamten Daten eines oder mehrerer Indizes beinhaltet und verwaltet. Außerdem stellt er die "Suchbarkeit" über alle Nodes innerhalb des CLusters bereit. So ist es zum Beispiel möglich, mit entsprechnder Konfiguration, auf mehreren Indizes gleichzeitig zu suchen. In der Regel befindet sich in einem Cluster ein Node mit einem Index. Lediglich in großen Datenstrukturen macht es Sinn mehreren Nodes innerhalb eines Clusters zu haben. Dies ist immer dann besonders sinvoll, wenn man über mehrere Server verfügt, die dann als Gesamtheit einen Cluster blden. Ein Cluster wird üblciherweise durch seinen Namen identifiziert. Standardmäßig ist das "elasticsearch".
+Vorangegangen wurde ja bereits der Begriff Cluster erwähnt. Doch was zeichnet einen Cluster in Elasticsearch aus? Ein Cluster ist eine Collection von ein oder mehreren Nodes, welche die gesamten Daten eines oder mehrerer Indizes beinhaltet und verwaltet. Außerdem stellt er die "Suchbarkeit" über alle Nodes innerhalb des Clusters bereit. So ist es zum Beispiel möglich, mit entsprechender Konfiguration, auf mehreren Indizes gleichzeitig zu suchen. In der Regel befindet sich in einem Cluster eine Node mit einem Index. Lediglich in großen Datenstrukturen macht es Sinn mehreren Nodes innerhalb eines Clusters zu haben. Dies ist immer dann besonders sinvoll, wenn man über mehrere Server verfügt, die dann als Gesamtheit einen Cluster blden. Ein Cluster wird üblicherweise durch seinen Namen identifiziert. Standardmäßig ist das "elasticsearch".
 
-Wie bereits erwähnt repräsentiert eine Node immer einen Server, genauer gesagt eine Elasticsearch-Instanz auf einem Server. Sie enthält Daten (als Documents) innerhalb eines Index' und trägt ihren Teil zur Indexierung und Suchfunktionalität in dem Cluster bei. Wie ein Cluster verfügt auch eine Node über einen eindeutigen Namen. Dieser wird beim Start der Instanz zufallsgeneriert und der Node zugewiesen. Auch dieser Name kann durch den Nutzer geändert werden. Beim Erzeugen der Node/Instanz erstellen sie aut0matisch einen Cluster "elasticsearch" oder treten diesem bei, sofern er schon existiert. Somit lassen sich sehr leicht beliebig viele Nodes in einen Cluster bringen.
+Wie bereits erwähnt repräsentiert eine Node immer einen Server, genauer gesagt eine Elasticsearch-Instanz auf einem Server. Sie enthält Daten (als Documents) innerhalb eines Index' und trägt ihren Teil zur Indexierung und Suchfunktionalität in dem Cluster bei. Wie ein Cluster verfügt auch eine Node über einen eindeutigen Namen. Dieser wird beim Start der Instanz zufallsgeneriert und der Node zugewiesen. Auch dieser Name kann durch den Nutzer geändert werden. Beim Erzeugen der Node/Instanz erstellt die Node automatisch einen Cluster "elasticsearch" oder treten diesem bei, sofern er schon existiert. Somit lassen sich sehr leicht beliebig viele Nodes in einen Cluster bringen.
 
 Wie bereits beschrieben repräsentiert der Index die Datenbank. Es ist möglich innerhalb einen Clusters beliebig viele Inidzes erstellen lassen. Diese werden dann durch das Sharding "aufgetrennt" und über mehrere Nodes verteilt
 
@@ -61,7 +16,7 @@ Zu einem weiteren Basiskonzept von Elasticsearch gehört das bereits erwähnte S
 
 Beim Hinzufügen von Daten werden die Shards gleichmäßig befüllt, sodass Datenlast stets fair verteilt bleibt. Elasticsearch erstellt die Shards innerhalb des Clusters standardmäßig und vollautomatisch, um die vertikale Skalierbarkeit zu gewährleisten und die Suche performant zu halten. Zusätlich wird zu jedem Shard ein Backup angelegt. Sollte ein Shard unerwartet nicht mehr lesbar oder verfügbar sein, kann auf das Replika zurückgeriffen werden. Das Replika jedes Shards befindet sich niemals auf der selben Node, um die ständige Verfügbarkeit zu gewährleisten.
 
-Außer der Konfiguration von Shard- und Replika-anzahl muss der Nutzer keine Einstellungen für das Sharding vornehmen. Wie bereits erwähnt muss sich der Nutzer nicht darum kümmern, wie die Shards verteilt sind und wie sie zusammengenommen wieder einen befüllten Index ergeben. Trotzdem gibt es die Möglichkeit die Shards genauer zu unteruschen. Das folgende Beispiel soll das Erstellen eines Index mit benutzerdiefierten Shards verdeutlichen und zeigen, dass die Daten gleichmäßig auf die Shards verteilt werden.
+Außer der Konfiguration von Shard- und Replika-Anzahl muss der Nutzer keine Einstellungen für das Sharding vornehmen. Wie bereits erwähnt muss sich der Nutzer nicht darum kümmern, wie die Shards verteilt sind und wie sie zusammengenommen wieder einen befüllten Index ergeben. Trotzdem gibt es die Möglichkeit die Shards genauer zu untersuchen. Das folgende Beispiel soll das Erstellen eines Index mit benutzerdefinierten Shards verdeutlichen und zeigen, dass die Daten gleichmäßig auf die Shards verteilt werden.
 
 Ein Beispiel zeigt, wie sich dieses Prinzip in der Praxis verhält:
 Für die Elasticsearch-Suchengine werden zwei identische Server gemietet, welche die Suchanfragen verarbeiten sollen. Auf diesen läuft dann jeweils eine Elasticsearch-Instanz (Node). Wenn ein Server aufgrund von Stromausfall oder ähnlichen Problemen nicht erreichbar ist, kann die Suche immer noch auf der anderen Maschine erfolgen. Die Server teilen sich also normalerweise die Arbeit, wenn es aber zu Problemen eine Servers kommt, so „springt“ der andere für ihn ein, um die komplette Funktionalität weiter zu gewährleisten.
@@ -87,7 +42,7 @@ Folgendes Schaubild zeigt die Verteilung von zwei Indizes innerhalb der Beispiel
 
 Dieses Besipiel verdeutlicht, wie Elasticsearch das Sharding selbständig ausführt. Doch wie gewährleistet Elasticsearch die vertikale Skalierbarkeit? Darüber soll folgendes Beispiel Aufschluss geben:
 
-Im ersten Schritt wird ein neuer Index auf dem gestarteten Elasticsearch-Server angelegt. Nun besitzen wir einen Index auf einer Node, welche sich in einem Cluster befindet. Eine Erstellung meherer Nodes, welche dann über eigenständige Shards verfügen ist ebenfalls möglich, soll in diesem Beispiel aber nicht weiter vertieft werden.
+Im ersten Schritt wird ein neuer Index auf dem gestarteten Elasticsearch-Server angelegt. Nun besitzen wir einen Index auf einer Node, welche sich in einem Cluster befindet. Eine Erstellung meherer Nodes, welche dann über eigenständige Shards verfügen ist ebenfalls möglich, soll in diesem Beispiel aber erstmal nicht weiter vertieft werden.
 
 Der Index auf dem Node verfügt immer über das Standard-Setting mit 5 Shards und einem Replika pro Shard.
 
@@ -248,8 +203,4 @@ books_less_shards 0 r STARTED 41 23.7kb 127.0.0.1 Jekyll
 ```
 Der Shard 0 wurde von der Acrobat-Node auf die Zombie-Node verschoben. Der Replika Shard wurde davon nicht beeinflusst.
 
-Somit wurde verdeutlicht, dass es trotz der automatisierten Verwaltung der Shards durch Elasticsearch möglich ist die Shards auf den Nodes individuell zu verteilen. Das ist beispielsweise besonders hilfreich, wenn die Server unterschiedlich stark sind und somit auch unterschiedlich viele Shards enthalten sollten. 
-
-
-## Fazit
-Shards lassen sich mittlerweile auf fast allen Datenbanktypen einrichten. Gerade hinsichtlich Kosteneffizienz und kurzer Antwortzeiten bringt es einen enormen Vorteil gegenüber ungeshardeter Datenbanken. Jedoch stellt das Einrichten von Shards einen zusätzlichen Aufwand dar, welcher sich dann wieder in Kosten niederschlägt. Jedoch verfügen NoSQL Implementationen, wie MongoDB oder die Such-Engine Elasticsearch über Mechanismen, welche einem die aufwändige Einrichtung und Verwaltung der Shards abnehmen.
+Somit wurde verdeutlicht, dass es trotz der automatisierten Verwaltung der Shards durch Elasticsearch möglich ist die Shards auf den Nodes individuell zu verteilen. Das ist beispielsweise besonders hilfreich, wenn die Server unterschiedlich stark sind und somit auch unterschiedlich viele Shards enthalten sollten.
