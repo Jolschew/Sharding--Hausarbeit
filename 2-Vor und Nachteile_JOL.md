@@ -1,4 +1,4 @@
-## Vor- und Nachteile von Sharding [FHK2017]
+## Vor- und Nachteile von Sharding [FHK2012]
 
 Vorteile:
 Große Datenmengen können über mehrere Server hinweg aufgeteilt werden. Weil Server mit viel Speicherplatz in der Regel eine exponentielle Preissteigerung im Vergleich zu vielen kleinen kostengünstigen Servern besitzen, stellt das Sharding eine gute Möglichkeit dar, die regelmäßigen Serverkosten zu minimieren, da auch große zusammenhängende Daten einer Datenbank auf vielen kleinen Servern verteilt werden können.
