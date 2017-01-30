@@ -8,8 +8,6 @@
 
 [MYS2017]: Oracle Corporation: 8.3.2.2 Sharding Scenario. Online verfügbar unter https://dev.mysql.com/doc/mysql-utilities/1.5/en/fabric-quick-start-sharding-scenario.html, zuletzt geprüft am 25.1.2017.
 
-[MDB2017P]: MongoDB Inc: Sharding, "MongoDB shards data at the collection level, distributing the collection data across the shards in the cluster.
-
-". Online verfügbar unter https://docs.mongodb.com/manual/sharding/, zuletzt geprüft am 28.1.2017.
+[MDB2017P]: MongoDB Inc: Sharding, "MongoDB shards data at the collection level, distributing the collection data across the shards in the cluster.". Online verfügbar unter https://docs.mongodb.com/manual/sharding/, zuletzt geprüft am 28.1.2017.
 
 [MDB2017]: MongoDB Inc: Sharding. Online verfügbar unter https://docs.mongodb.com/manual/reference/command/enableSharding/#dbcmd.enableSharding, zuletzt geprüft am 28.1.2017.
