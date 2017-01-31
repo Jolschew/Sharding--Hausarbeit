@@ -11,8 +11,19 @@
 1. Einleitung (JOL)
 - Vor- und Nachteile von Sharding (JOL)
 - Sharding Grundlagen (KBE)
+  - Auswahl des Sharding-Keys
+  - Shard Mapping
+  - Welche Datenbanken unterstützen Sharding?
+  - NoSQL und Sharding - Ein attraktiver Verbund
 - Beispiel: MySQL (KBE)
+  - Was ist MySQL?
+  - Einführung
+  - Praktisches Beispiel
+  - MySQL Fabric
 - Beispiel: Mongo DB (KBE)
+  - Was ist MongoDB?
+  - Einführung
+  - Einrichtung und praktisches Beispiel
 - Beispiel: Elasticsearch (JOL)
   - Komponenten
   - Beispiel
