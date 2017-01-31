@@ -4,6 +4,8 @@
 
 [ES2017]: Elastic.co: Basic Concepts. Online verfügbar unter https://www.elastic.co/guide/en/elasticsearch/reference/5.1/_basic_concepts.html, zuletzt geprüft am 30.1.2017.
 
+[DBSA2017]: Elastic.co: Disk-based Shard Allocation. Online verfügbar unter https://www.elastic.co/guide/en/elasticsearch/reference/current/disk-allocator.html#disk-allocator, zuletzt geprüft am 31.1.2017
+
 [DBE2017]: solid IT gmbh: Sharding. Online verfügbar unter http://db-engines.com/de/article/Sharding, zuletzt geprüft am 30.1.2017.
 
 [MYS2017]: Oracle Corporation: 8.3.2.2 Sharding Scenario. Online verfügbar unter https://dev.mysql.com/doc/mysql-utilities/1.5/en/fabric-quick-start-sharding-scenario.html, zuletzt geprüft am 25.1.2017.

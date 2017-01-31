@@ -5,6 +5,8 @@ Die RESTful API, welche Elasticsearch zu Client-Server-Kommunikation nutzt, ist 
 
 Durch die Eigenschaft von Elasticsearch als Volltext-Suchamschine mit einer NoSQL-Datenbank im Kern, ist es potentiell möglich, dass auch sehr viele Daten aufgenommen werden. Mehrere Milliarden Dokumente in einem Index führen auch zu mehreren TerraByte an benötigtem Festplattenspeicher. Dann ist es wahrscheinlich, dass die Server-Festplatte zu klein oder langsam ist, viele Suchrequests auf einem Index zu verarbeiten
 
+### Komponenten
+
 Um ein genaues Verständnis dafür zu bekommen, wie Elasticsearch das Sharding vollkommen selbständig übernimmt, ist es notwendig einige Basiskonzepte von Elasticsearch zu erkennen.
 Vorangegangen wurde ja bereits der Begriff Cluster erwähnt. Doch was zeichnet einen Cluster in Elasticsearch aus? Ein Cluster ist eine Collection von ein oder mehreren Nodes, welche die gesamten Daten eines oder mehrerer Indizes beinhaltet und verwaltet. Außerdem stellt er die "Suchbarkeit" über alle Nodes innerhalb des Clusters bereit. So ist es zum Beispiel möglich, mit entsprechender Konfiguration, auf mehreren Indizes gleichzeitig zu suchen. In der Regel befindet sich in einem Cluster eine Node mit einem Index. Lediglich in großen Datenstrukturen macht es Sinn mehreren Nodes innerhalb eines Clusters zu haben. Dies ist immer dann besonders sinvoll, wenn man über mehrere Server verfügt, die dann als Gesamtheit einen Cluster blden. Ein Cluster wird üblicherweise durch seinen Namen identifiziert. Standardmäßig ist das "elasticsearch".
 
@@ -42,6 +44,7 @@ Folgendes Schaubild zeigt die Verteilung von zwei Indizes innerhalb der Beispiel
 
 Dieses Besipiel verdeutlicht, wie Elasticsearch das Sharding selbständig ausführt. Doch wie gewährleistet Elasticsearch die vertikale Skalierbarkeit? Darüber soll folgendes Beispiel Aufschluss geben:
 
+### Beispiel
 Im ersten Schritt wird ein neuer Index auf dem gestarteten Elasticsearch-Server angelegt. Nun besitzen wir einen Index auf einer Node, welche sich in einem Cluster befindet. Eine Erstellung meherer Nodes, welche dann über eigenständige Shards verfügen ist ebenfalls möglich, soll in diesem Beispiel aber erstmal nicht weiter vertieft werden.
 
 Der Index auf dem Node verfügt immer über das Standard-Setting mit 5 Shards und einem Replika pro Shard.
@@ -147,8 +150,6 @@ books_less_shards 1 p STARTED    42 14.6kb 127.0.0.1 Acrobat
 books_less_shards 1 r UNASSIGNED                             
 books_less_shards 0 p STARTED    41 23.7kb 127.0.0.1 Acrobat
 books_less_shards 0 r UNASSIGNED                             
-
-
 ```
 
 Diese Übersicht gibt verschiedene Informationen.
@@ -177,6 +178,7 @@ books_less_shards 0 r STARTED 41 23.7kb 127.0.0.1 Jekyll
 books_less_shards 0 p STARTED 41 23.7kb 127.0.0.1 Acrobat
 
 ```
+### Shards verschieben
 
 Um zu verdeutlichen, dass Elasticsearch sehr flexibel in der Verwaltung von Shards ist, sollen nun einzelne Shards auf andere Nodes verschoben werden. Hierfür stellt ELasticsearch den Reroute Befehl bereit:
 ```javascript
@@ -204,3 +206,32 @@ books_less_shards 0 r STARTED 41 23.7kb 127.0.0.1 Jekyll
 Der Shard 0 wurde von der Acrobat-Node auf die Zombie-Node verschoben. Der Replika Shard wurde davon nicht beeinflusst.
 
 Somit wurde verdeutlicht, dass es trotz der automatisierten Verwaltung der Shards durch Elasticsearch möglich ist die Shards auf den Nodes individuell zu verteilen. Das ist beispielsweise besonders hilfreich, wenn die Server unterschiedlich stark sind und somit auch unterschiedlich viele Shards enthalten sollten.
+
+### Shard-Konfigurationen
+Elasticsearch überwacht standardmäßig den Festplattenspeicher einer Node und macht davon abhängig, ob der Node weitere Shards zugewiesen werden dürfen [DBSA2017]. Somit wird jederzeit sichergestellt, dass Nodes nicht "volllaufen". Durch folgenden Befehl lässt sich dies Einstellung jedoch deaktivieren, auch wenn davon in den meisten Fällen abzuraten ist:
+```javascript
+PUT /_cluster/settings
+{
+    "transient" : {
+        "cluster.routing.allocation.disk.threshold_enabled" : false
+    }
+}
+```
+Ist dieser Wert jedoch aktiviert so gibt es zwei Settings, die von bedeutung sind:
+```javascript
+cluster.routing.allocation.disk.watermark.low
+cluster.routing.allocation.disk.watermark.high
+```
+Der Low-Watermark Wert beträgt standardmäßig 85% Festplattenspeicher und bewirkt, dass ab diesem Wert keine neuen Shards der Node hinzugefügt werden. Der High-Watermark beträgt standardmäßig 90% und bewirkt, dass wenn dieser Wert überstiegen wurde, Shards von der Node auf eine andere verlegt werden. Auch diese Wert können angepasste werden und beispielsweise auch absoulte Werte tragen:
+```javascript
+PUT _cluster/settings
+{
+  "transient": {
+    "cluster.routing.allocation.disk.watermark.low": "50%",
+    "cluster.routing.allocation.disk.watermark.high": "20gb"
+  }
+}
+```
+Zusätzlich stellt Elasticsearch noch weitere Einstellmöglichkeiten für die Shardzuweisung bereit. So kann die maximale ANzahl an Shards pro Node festgelegt werden oder die Shardzuweisung von bestimmten Attributen innerhalb des Index' oder Clusters abhängig gemacht werden.
+
+Auch wenn Elasticsearch den Erstellungs- und Verwaltungsprozess von Shards vollkommen selbstständig übernimmt, so hat der Nutzer vielfältige Möglchkeiten das Shardingverfahren an seine Architektur anzupassen und in seinem Sinne zu optimieren.

@@ -14,4 +14,8 @@
 - Beispiel: MySQL (KBE)
 - Beispiel: Mongo DB (KBE)
 - Beispiel: Elasticsearch (JOL)
+  - Komponenten
+  - Beispiel
+  - Shards verschieben
+  - Shard-Konfigurationen
 - Fazit (JOL)
