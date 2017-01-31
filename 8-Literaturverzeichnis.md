@@ -13,3 +13,7 @@
 [MDB2017P]: MongoDB Inc: Sharding, "MongoDB shards data at the collection level, distributing the collection data across the shards in the cluster.". Online verfügbar unter https://docs.mongodb.com/manual/sharding/, zuletzt geprüft am 28.1.2017.
 
 [MDB2017]: MongoDB Inc: Sharding. Online verfügbar unter https://docs.mongodb.com/manual/reference/command/enableSharding/#dbcmd.enableSharding, zuletzt geprüft am 28.1.2017.
+
+[MDB2017C]: MongoDB Inc: Sharded Cluster, deploying a  replica set. Online verfügbar unter https://docs.mongodb.com/manual/tutorial/deploy-shard-cluster/, zuletzt geprüft am 31.1.2017
+
+[MDB2017R]: MongoDB Inc: Creation of replica sets and config Servers. Online verfügbar unter https://docs.mongodb.com/manual/reference/method/rs.initiate/#rs.initiate, zuletzt geprüft am 31.1.2017
