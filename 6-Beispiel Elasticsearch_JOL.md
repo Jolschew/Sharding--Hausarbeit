@@ -208,7 +208,7 @@ Der Shard 0 wurde von der Acrobat-Node auf die Zombie-Node verschoben. Der Repli
 Somit wurde verdeutlicht, dass es trotz der automatisierten Verwaltung der Shards durch Elasticsearch möglich ist die Shards auf den Nodes individuell zu verteilen. Das ist beispielsweise besonders hilfreich, wenn die Server unterschiedlich stark sind und somit auch unterschiedlich viele Shards enthalten sollten.
 
 ### Shard-Konfigurationen
-Elasticsearch überwacht standardmäßig den Festplattenspeicher einer Node und macht davon abhängig, ob der Node weitere Shards zugewiesen werden dürfen [DBSA2017]. Somit wird jederzeit sichergestellt, dass Nodes nicht "volllaufen". Durch folgenden Befehl lässt sich dies Einstellung jedoch deaktivieren, auch wenn davon in den meisten Fällen abzuraten ist:
+Elasticsearch überwacht standardmäßig den Festplattenspeicher einer Node und macht davon abhängig, ob der Node weitere Shards zugewiesen werden dürfen [DBSA2017]. Somit wird jederzeit sichergestellt, dass Nodes nicht "volllaufen". Durch folgenden Befehl lässt sich diese Einstellung jedoch deaktivieren, auch wenn davon in den meisten Fällen abzuraten ist:
 ```javascript
 PUT /_cluster/settings
 {
@@ -217,12 +217,12 @@ PUT /_cluster/settings
     }
 }
 ```
-Ist dieser Wert jedoch aktiviert so gibt es zwei Settings, die von bedeutung sind:
+Ist dieser Wert jedoch aktiviert so gibt es zwei Settings, die von Bedeutung sind:
 ```javascript
 cluster.routing.allocation.disk.watermark.low
 cluster.routing.allocation.disk.watermark.high
 ```
-Der Low-Watermark Wert beträgt standardmäßig 85% Festplattenspeicher und bewirkt, dass ab diesem Wert keine neuen Shards der Node hinzugefügt werden. Der High-Watermark beträgt standardmäßig 90% und bewirkt, dass wenn dieser Wert überstiegen wurde, Shards von der Node auf eine andere verlegt werden. Auch diese Wert können angepasste werden und beispielsweise auch absoulte Werte tragen:
+Der Low-Watermark Wert beträgt standardmäßig 85% Festplattenspeicher und bewirkt, dass ab diesem Wert keine neuen Shards der Node hinzugefügt werden. Der High-Watermark beträgt standardmäßig 90% und bewirkt, dass wenn dieser Wert überstiegen wurde, Shards von der Node auf eine andere verlegt werden. Auch diese Wert können angepasst werden und beispielsweise auch absoulte Werte tragen:
 ```javascript
 PUT _cluster/settings
 {
@@ -232,6 +232,7 @@ PUT _cluster/settings
   }
 }
 ```
-Zusätzlich stellt Elasticsearch noch weitere Einstellmöglichkeiten für die Shardzuweisung bereit. So kann die maximale ANzahl an Shards pro Node festgelegt werden oder die Shardzuweisung von bestimmten Attributen innerhalb des Index' oder Clusters abhängig gemacht werden.
+
+Zusätzlich zur Festplatten-basierten Shardzuweisung stellt Elasticsearch noch weitere Einstellmöglichkeiten für die Shardzuweisung bereit. So kann die maximale Anzahl an Shards pro Node festgelegt werden oder die Shardzuweisung von bestimmten Attributen innerhalb des Index' oder Clusters abhängig gemacht werden.
 
 Auch wenn Elasticsearch den Erstellungs- und Verwaltungsprozess von Shards vollkommen selbstständig übernimmt, so hat der Nutzer vielfältige Möglchkeiten das Shardingverfahren an seine Architektur anzupassen und in seinem Sinne zu optimieren.
